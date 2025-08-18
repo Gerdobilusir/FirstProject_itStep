@@ -1,0 +1,44 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+
+webTest = webdriver.Chrome()
+webTest.get("https://exe.ua/")
+print("Page is open")
+
+def clear_input(element):
+    element.send_keys(Keys.CONTROL, 'a')  # выделяем всё
+    element.send_keys(Keys.DELETE)         # удаляем
+
+# Список товаров для поиска
+items = ["Ноутбук", "наушники", "ножницы", "стул", "Телевизор"]
+# elem является придуманным значением отображающим суть 
+for elem in items:
+    # Находим поле поиска
+    search = webTest.find_element(By.XPATH, "//*[@id='search_query']")
+    clear_input(search)
+    search.send_keys(elem)
+    search.send_keys(Keys.ENTER)
+
+    time.sleep(2)  # ждём загрузки страницы
+
+    try:
+        # Берём название первого найденного товара
+        product_name = webTest.find_element(By.XPATH, "//h5/a/span").text
+        print(f"🔎 Запрос: {elem} | Найдено: {product_name}")
+
+        # Проверка через if-else
+        if elem.lower() in product_name.lower():
+            print("✅ Название соответствует запросу")
+        else:
+            print("❌ Название НЕ соответствует запросу")
+
+    except:
+        print(f"❌ По запросу '{elem}' товар не найден")
+
+    print("-" * 40)
+
+time.sleep(2)
+print("Page is close")
+webTest.quit()
